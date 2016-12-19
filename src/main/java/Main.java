@@ -1,5 +1,3 @@
-import com.github.andrewoma.dexx.collection.ArrayList;
-import com.github.andrewoma.dexx.collection.List;
 import com.sun.org.apache.xpath.internal.SourceTree;
 import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.ext.com.google.common.base.Predicate;
@@ -18,8 +16,7 @@ import org.apache.jena.vocabulary.VCARD;
 
 import java.io.File;
 import java.io.InputStream;
-import java.util.Iterator;
-import java.util.Scanner;
+import java.util.*;
 
 /**
  * Created by slayer on 11/28/16.
@@ -43,7 +40,7 @@ public class Main {
         //scanner.nextLine();
         Integer option;
         option = scanner.nextInt();
-        System.out.println(option);
+        //System.out.println(option);
 
         switch (option) {
             case 0:
@@ -64,48 +61,57 @@ public class Main {
             default:
                 System.out.println("The option is not valid");
         }
-        ontModel.read("dbpedia_2014.owl");
-        model.read(in,null);
+        //ontModel.read("dbpedia_2014.owl");
+        while(true) {
+            model.read(in, null);
 
-        StmtIterator iterator = model.listStatements();
-        //Property prop = model.getProperty(propertyNS + "developer");
-        //Resource r = model.getResource(resNS + "Battlefield:_Bad_Company_2");
-        //Resource res = r.getProperty(prop).getResource();
-        //System.out.println(res);
-        ArrayList<String> properties = new ArrayList<String>();
-        while(iterator.hasNext()) {
-            Statement statement = iterator.nextStatement();
-            Property p = statement.getPredicate();
-            
+            StmtIterator iterator = model.listStatements();
+            List<String> properties = new ArrayList<String>();
+            List<Resource> resources = new ArrayList<Resource>();
+
+            while (iterator.hasNext()) {
+                Statement statement = iterator.nextStatement();
+                Property p = statement.getPredicate();
+                Resource r = statement.getSubject();
+                if (p.toString().contains(propertyNS) && !properties.contains(p.toString().replaceAll(propertyNS, ""))) {
+                    properties.add(p.toString().replaceAll(propertyNS, ""));
+                    resources.add(r);
+                }
+            }
+            for (int i = 0; i < properties.size(); i++)
+                System.out.println(i + ":" + properties.get(i));
+            option = scanner.nextInt();
+
+            Property property = model.getProperty(propertyNS + properties.get(option));
+            NodeIterator nodeIterator = model.listObjectsOfProperty(property);
+            int j=0;
+            List<RDFNode> newResource = new ArrayList<RDFNode>();
+            while (nodeIterator.hasNext()) {
+                RDFNode ans = nodeIterator.nextNode();
+                if(!newResource.contains(ans)) {
+                    newResource.add(ans);
+                    System.out.println(j + ":" + ans.toString().replaceAll(resNS,""));
+                    j++;
+                }
+            }
+            option = scanner.nextInt();
+            if(option == -1){
+                break;
+            }
+            else {
+                in = FileManager.get().open(newResource.get(option).toString().replace(resNS, dataNS) + ".rdf");
+                System.out.println(newResource.get(option).toString().replaceAll(resNS,dataNS) + ".rdf");
+                properties.clear();
+                resources.clear();
+                newResource.clear();
+                model = ModelFactory.createDefaultModel();
+            }
+
 
         }
-        //Resource resource = (Resource)r.getProperty(prop).getResource();
-        //System.out.println(resource);
-        /*while(iterator.hasNext()) {
-            Statement statement = iterator.nextStatement();
-            Resource subject = statement.getSubject();
-            Property predicate = statement.getPredicate();
-            RDFNode object = statement.getObject();
-            System.out.println(object.toString().replaceAll(resNS,"") + " is " + predicate.toString().replaceAll(ns,"") + " of " + subject.toString().replaceAll(resNS,""));
-        }*/
-        OntClass ontClass = ontModel.getOntClass(ns + "VideoGame");
-        Model m = ontClass.getModel();
-        StmtIterator i = m.listStatements();
-       /*while(i.hasNext()) {
-            Statement statement = i.nextStatement();
-            Resource subject = statement.getSubject();
-            Property predicate = statement.getPredicate();
-            RDFNode object = statement.getObject();
-            System.out.println("Subject: " + subject.toString());
-            //System.out.println("Predicate: " + predicate.toString());
-            //if(object instanceof Resource)
-                if(subject.toString().contains("/resource/"))
-                    System.out.println("Subject: " + subject.toString());
 
-        }*/
 
-        //System.out.println(ontClass);
-        //model.write(System.out,"Turtle");
+
 
 
     }
