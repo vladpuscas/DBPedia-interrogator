@@ -73,8 +73,8 @@ public class Main {
                 Statement statement = iterator.nextStatement();
                 Property p = statement.getPredicate();
                 Resource r = statement.getSubject();
-                if (p.toString().contains(propertyNS) && !properties.contains(p.toString().replaceAll(propertyNS, ""))) {
-                    properties.add(p.toString().replaceAll(propertyNS, ""));
+                if (p.toString().contains(ns) && !properties.contains(p.toString().replaceAll(ns, ""))) {
+                    properties.add(p.toString().replaceAll(ns, ""));
                     resources.add(r);
                 }
             }
@@ -82,7 +82,7 @@ public class Main {
                 System.out.println(i + ":" + properties.get(i));
             option = scanner.nextInt();
 
-            Property property = model.getProperty(propertyNS + properties.get(option));
+            Property property = model.getProperty(ns + properties.get(option));
             NodeIterator nodeIterator = model.listObjectsOfProperty(property);
             int j=0;
             List<RDFNode> newResource = new ArrayList<RDFNode>();
@@ -99,12 +99,18 @@ public class Main {
                 break;
             }
             else {
-                in = FileManager.get().open(newResource.get(option).toString().replace(resNS, dataNS) + ".rdf");
-                System.out.println(newResource.get(option).toString().replaceAll(resNS,dataNS) + ".rdf");
-                properties.clear();
-                resources.clear();
-                newResource.clear();
-                model = ModelFactory.createDefaultModel();
+                if(newResource.get(option).toString().contains(resNS)) {
+                    in = FileManager.get().open(newResource.get(option).toString().replace(resNS, dataNS) + ".rdf");
+                    System.out.println(newResource.get(option).toString().replaceAll(resNS, dataNS) + ".rdf");
+                    properties.clear();
+                    resources.clear();
+                    newResource.clear();
+                    model = ModelFactory.createDefaultModel();
+                }
+                else {
+                    System.out.println(newResource.get(option).toString());
+                    break;
+                }
             }
 
 
