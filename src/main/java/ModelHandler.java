@@ -9,15 +9,20 @@ import java.io.InputStream;
 public class ModelHandler {
     private Model model;
     private InputStream inputStream;
+    private String resourceName;
     private static String dataNS = "http://dbpedia.org/data/";
     public ModelHandler() {
         model = ModelFactory.createDefaultModel();
         inputStream = null;
     }
     public void loadModel(String resource) {
+        resourceName = resource;
         model = ModelFactory.createDefaultModel();
         inputStream = FileManager.get().open(dataNS + resource + ".rdf");
         model.read(inputStream,null);
+    }
+    public String getResource() {
+        return resourceName;
     }
     public StmtIterator getStatements() {
         return model.listStatements();

@@ -9,7 +9,7 @@ import java.util.Scanner;
  */
 public class Runner {
     private StatementHandler statementHandler;
-    public static String[] domains = {"The_Witcher_3:_Wild_Hunt", "Age_of_Empires", "Battlefield:_Bad_Company_2", "The_Witcher_2:_Assassins_of_kings", "Assassin's_Creed_IV"};
+    public static String[] domains = {"The_Witcher_3:_Wild_Hunt", "Age_of_Empires", "Battlefield:_Bad_Company_2", "The_Witcher_2:_Assassins_of_Kings", "Assassin's_Creed_IV:_Black_Flag"};
     public Runner () {
         statementHandler = new StatementHandler();
     }
@@ -17,6 +17,7 @@ public class Runner {
         Property property = statementHandler.getProperty(chooseDomain());
         String resource = statementHandler.getResourceWithProperty(property);
         statementHandler.listResources(resource,property);
+
     }
     private String chooseDomain() {
         for(int i=0; i<domains.length; i++)
